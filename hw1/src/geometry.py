@@ -1,3 +1,4 @@
+import torch
 from jaxtyping import Float
 from torch import Tensor
 
@@ -6,16 +7,14 @@ def homogenize_points(
     points: Float[Tensor, "*batch dim"],
 ) -> Float[Tensor, "*batch dim+1"]:
     """Turn n-dimensional points into (n+1)-dimensional homogeneous points."""
-
-    raise NotImplementedError("This is your homework.")
+    return torch.cat([points, torch.tensor([1.0])])
 
 
 def homogenize_vectors(
     points: Float[Tensor, "*batch dim"],
 ) -> Float[Tensor, "*batch dim+1"]:
     """Turn n-dimensional vectors into (n+1)-dimensional homogeneous vectors."""
-
-    raise NotImplementedError("This is your homework.")
+    return torch.cat([points, torch.tensor([0.0])])
 
 
 def transform_rigid(
@@ -23,8 +22,7 @@ def transform_rigid(
     transform: Float[Tensor, "*#batch 4 4"],
 ) -> Float[Tensor, "*batch 4"]:
     """Apply a rigid-body transform to homogeneous points or vectors."""
-
-    raise NotImplementedError("This is your homework.")
+    return torch.mm(transform, xyz.unsqueeze(1)).squeeze(1)
 
 
 def transform_world2cam(
@@ -34,8 +32,7 @@ def transform_world2cam(
     """Transform points or vectors from homogeneous 3D world coordinates to homogeneous
     3D camera coordinates.
     """
-
-    raise NotImplementedError("This is your homework.")
+    return torch.mm(torch.inverse(cam2world), xyz.unsqueeze(1)).squeeze(1)
 
 
 def transform_cam2world(
@@ -45,8 +42,7 @@ def transform_cam2world(
     """Transform points or vectors from homogeneous 3D camera coordinates to homogeneous
     3D world coordinates.
     """
-
-    raise NotImplementedError("This is your homework.")
+    return torch.mm(cam2world, xyz.unsqueeze(1)).squeeze(1)
 
 
 def project(
@@ -54,5 +50,5 @@ def project(
     intrinsics: Float[Tensor, "*#batch 3 3"],
 ) -> Float[Tensor, "*batch 2"]:
     """Project homogenized 3D points in camera coordinates to pixel coordinates."""
-
-    raise NotImplementedError("This is your homework.")
+    projected = torch.mm(intrinsics, xyz[:-1].unsqueeze(1)).squeeze(1)
+    return torch.tensor([projected[0] / projected[-1], projected[1] / projected[-1]])
