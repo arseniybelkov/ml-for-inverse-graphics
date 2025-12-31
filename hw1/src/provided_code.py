@@ -10,7 +10,8 @@ from jaxtyping import Float, Int, UInt8
 from PIL import Image
 from scipy.spatial.transform import Rotation as R
 from torch import Tensor
-from trimesh.exchange.obj import load_obj
+# from trimesh.exchange.obj import load_obj
+import trimesh
 
 FloatImage = Union[
     Float[Tensor, "height width"],
@@ -64,10 +65,11 @@ def load_mesh(
     path: Path, device: torch.device = torch.device("cpu")
 ) -> tuple[Float[Tensor, "vertex 3"], Int[Tensor, "face 3"]]:
     """Load a mesh."""
-    with path.open("r") as f:
-        mesh = load_obj(f)
-    vertices = torch.tensor(mesh["vertices"], dtype=torch.float32, device=device)
-    faces = torch.tensor(mesh["faces"], dtype=torch.int64, device=device)
+    # with path.open("r") as f:
+    #     mesh = load_obj(f)
+    mesh = trimesh.load_mesh(path, force="mesh")
+    vertices = torch.tensor(mesh.vertices, dtype=torch.float32, device=device)
+    faces = torch.tensor(mesh.faces, dtype=torch.int64, device=device)
     return vertices, faces
 
 
